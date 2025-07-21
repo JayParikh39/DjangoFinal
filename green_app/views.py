@@ -8,6 +8,8 @@ from .forms import CustomUserCreationForm, GreenIdeaForm
 from django.db.models import Q
 from django.contrib.auth import logout as auth_logout
 from .utils import update_user_visit_session
+from datetime import datetime
+from django.utils.timezone import now
 
 class IndexView(ListView):
     model = GreenIdea
@@ -123,6 +125,13 @@ from django.utils.timezone import now
 def user_history_view(request):
     num_visits = request.session.get('num_visits', 0)
     last_visit = request.session.get('last_visit', 'First visit this session')
+
+    # Convert last_visit to datetime if it's a string and not the default
+    if isinstance(last_visit, str) and last_visit != 'First visit this session':
+        try:
+            last_visit = datetime.strptime(last_visit, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            last_visit = None
 
     # Update for next time
     request.session['num_visits'] = num_visits + 1

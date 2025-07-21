@@ -1,20 +1,446 @@
+
 {% extends 'green_app/base.html' %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title text-center mb-4">Share Your Green Idea</h2>
-                <form method="post" enctype="multipart/form-data">
+<div class="submit-container fade-in-up">
+    <div class="submit-hero">
+        <div class="hero-icon">
+            <i class="fas fa-lightbulb"></i>
+        </div>
+        <h1 class="submit-title">Share Your Green Idea</h1>
+        <p class="submit-subtitle">
+            Transform your innovative vision into reality. Share your eco-friendly solution with our global community of environmental pioneers.
+        </p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="submit-card">
+                <div class="form-progress">
+                    <div class="progress-step active">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Basic Info</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Details</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Submit</div>
+                    </div>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="submit-form" id="ideaForm">
                     {% csrf_token %}
-                    {{ form.as_p }}
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success">Submit Idea</button>
+                    
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Basic Information
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="id_title" class="form-label">
+                                <i class="fas fa-heading"></i>
+                                Idea Title
+                            </label>
+                            {{ form.title }}
+                            <div class="form-help">Give your idea a catchy, descriptive title (max 100 characters)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_category" class="form-label">
+                                <i class="fas fa-tags"></i>
+                                Category
+                            </label>
+                            {{ form.category }}
+                            <div class="form-help">Choose the category that best fits your green innovation</div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-file-alt"></i>
+                            Detailed Description
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="id_description" class="form-label">
+                                <i class="fas fa-align-left"></i>
+                                Description
+                            </label>
+                            {{ form.description }}
+                            <div class="form-help">
+                                Describe your idea in detail. Include:
+                                <ul class="help-list">
+                                    <li>What problem does it solve?</li>
+                                    <li>How does it work?</li>
+                                    <li>What makes it environmentally friendly?</li>
+                                    <li>What impact could it have?</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_image" class="form-label">
+                                <i class="fas fa-image"></i>
+                                Visual Representation (Optional)
+                            </label>
+                            <div class="file-upload-wrapper">
+                                {{ form.image }}
+                                <div class="file-upload-text">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Click to upload or drag and drop</span>
+                                    <small>PNG, JPG up to 10MB</small>
+                                </div>
+                            </div>
+                            <div class="form-help">Add an image, diagram, or photo to help illustrate your idea</div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="submission-guidelines">
+                            <h4><i class="fas fa-clipboard-check"></i> Submission Guidelines</h4>
+                            <div class="guidelines-grid">
+                                <div class="guideline-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Be original and innovative</span>
+                                </div>
+                                <div class="guideline-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Focus on environmental benefits</span>
+                                </div>
+                                <div class="guideline-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Provide clear, detailed explanations</span>
+                                </div>
+                                <div class="guideline-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Use respectful, professional language</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-modern btn-secondary" onclick="history.back()">
+                                <i class="fas fa-arrow-left"></i>
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn-modern btn-primary">
+                                <i class="fas fa-rocket"></i>
+                                Submit Your Idea
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.submit-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.submit-hero {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.hero-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.submit-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--dark-green);
+    margin-bottom: 1rem;
+}
+
+.submit-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.submit-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(34, 197, 94, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.form-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 1px solid rgba(34, 197, 94, 0.1);
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-number {
+    background: var(--primary-green);
+    color: white;
+}
+
+.step-label {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.progress-step.active .step-label {
+    color: var(--primary-green);
+}
+
+.progress-line {
+    width: 60px;
+    height: 2px;
+    background: #e5e7eb;
+    margin: 0 1rem;
+}
+
+.submit-form {
+    padding: 2rem;
+}
+
+.form-section {
+    margin-bottom: 3rem;
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--dark-green);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(34, 197, 94, 0.1);
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.submit-form input[type="text"],
+.submit-form select,
+.submit-form textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+}
+
+.submit-form input[type="text"]:focus,
+.submit-form select:focus,
+.submit-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.submit-form textarea {
+    min-height: 200px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-help {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+.help-list {
+    margin: 0.5rem 0 0 1rem;
+    padding: 0;
+}
+
+.help-list li {
+    margin-bottom: 0.25rem;
+    color: var(--text-light);
+}
+
+.file-upload-wrapper {
+    position: relative;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+}
+
+.file-upload-wrapper:hover {
+    border-color: var(--primary-green);
+    background: rgba(34, 197, 94, 0.05);
+}
+
+.submit-form input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-upload-text {
+    pointer-events: none;
+}
+
+.file-upload-text i {
+    font-size: 2rem;
+    color: var(--primary-green);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.file-upload-text span {
+    display: block;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.file-upload-text small {
+    color: var(--text-light);
+}
+
+.submission-guidelines {
+    background: rgba(34, 197, 94, 0.05);
+    border: 1px solid rgba(34, 197, 94, 0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.submission-guidelines h4 {
+    color: var(--dark-green);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.guidelines-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.guideline-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.guideline-item i {
+    color: var(--primary-green);
+    flex-shrink: 0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 2rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: var(--text-dark);
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .submit-title {
+        font-size: 2rem;
+    }
+    
+    .form-progress {
+        padding: 1rem;
+    }
+    
+    .progress-line {
+        width: 30px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .guidelines-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 {% endblock %}

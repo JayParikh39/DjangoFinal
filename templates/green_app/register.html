@@ -1,49 +1,239 @@
 {% extends 'green_app/base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-lg border-0" style="border-radius: 1.25rem; box-shadow: 0 8px 32px 0 rgba(34,197,94,0.25), 0 1.5px 6px 0 rgba(0,0,0,0.10);">
-            <div class="card-body p-5">
-                <h2 class="card-title text-center mb-4"><i class="fas fa-user-plus"></i> Register an Account</h2>
+<div class="row justify-content-center fade-in-up">
+    <div class="col-md-8 col-lg-6">
+        <div class="register-card">
+            <div class="register-header">
+                <div class="register-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h2 class="register-title">Join GreenTech</h2>
+                <p class="register-subtitle">Create your account and start sharing green innovations</p>
+            </div>
+            
+            <div class="register-body">
                 {% if form.errors %}
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                    {% for field in form %}
-                        {% for error in field.errors %}
-                            <li>{{ error }}</li>
+                <div class="modern-alert error-alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
                         {% endfor %}
-                    {% endfor %}
-                    {% for error in form.non_field_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                    </ul>
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
                 </div>
                 {% endif %}
+
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="id_username" class="form-label"><i class="fas fa-user"></i> Username</label>
-                        {{ form.username|add_class:'form-control' }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            {{ form.username|add_class:'form-control'|attr:'placeholder:Username'|attr:'aria-label:Username' }}
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="id_email" class="form-label"><i class="fas fa-envelope"></i> Email</label>
-                        {{ form.email|add_class:'form-control' }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            {{ form.email|add_class:'form-control'|attr:'placeholder:Email'|attr:'aria-label:Email' }}
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="id_password1" class="form-label"><i class="fas fa-lock"></i> Password</label>
-                        {{ form.password1|add_class:'form-control' }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            {{ form.password1|add_class:'form-control'|attr:'placeholder:Password'|attr:'aria-label:Password' }}
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="id_password2" class="form-label"><i class="fas fa-lock"></i> Confirm Password</label>
-                        {{ form.password2|add_class:'form-control' }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            {{ form.password2|add_class:'form-control'|attr:'placeholder:Confirm Password'|attr:'aria-label:Confirm Password' }}
+                        </div>
+                    </div>
+                    <div class="terms-agreement">
+                        <label class="terms-checkbox">
+                            <input type="checkbox" required>
+                            <span class="checkmark"></span>
+                            <span class="terms-text">
+                                I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+                            </span>
+                        </label>
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-success"><i class="fas fa-user-plus"></i> Register</button>
                     </div>
                 </form>
+
+                <div class="register-footer">
+                    <div class="login-link">
+                        <span>Already have an account?</span>
+                        <a href="{% url 'login' %}">Sign In</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.register-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.register-header {
+    background: linear-gradient(135deg, #059669, var(--primary-green));
+    color: white;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.register-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.register-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.register-subtitle {
+    opacity: 0.9;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.register-body {
+    padding: 2rem;
+}
+
+.register-form {
+    margin-bottom: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-help {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+    margin-left: 3rem;
+}
+
+.terms-agreement {
+    margin: 2rem 0 1.5rem;
+}
+
+.terms-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.terms-checkbox input[type="checkbox"] {
+    opacity: 0;
+    position: absolute;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.terms-checkbox input[type="checkbox"]:checked + .checkmark {
+    background: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+.terms-checkbox input[type="checkbox"]:checked + .checkmark::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    color: white;
+    font-size: 0.75rem;
+}
+
+.terms-text {
+    color: var(--text-light);
+}
+
+.terms-text a {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.terms-text a:hover {
+    text-decoration: underline;
+}
+
+.register-footer {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.login-link {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.login-link a {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 0.25rem;
+}
+
+.login-link a:hover {
+    color: var(--dark-green);
+}
+</style>
 {% endblock %}

@@ -1,29 +1,542 @@
+
 {% extends 'green_app/base.html' %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <h2>{{ object.title }}</h2>
+<div class="detail-container fade-in-up">
+    <div class="detail-header">
+        <nav class="breadcrumb-nav">
+            <a href="{% url 'index' %}" class="breadcrumb-link">
+                <i class="fas fa-home"></i>
+                Home
+            </a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="breadcrumb-current">{{ object.title|truncatechars:30 }}</span>
+        </nav>
+        
+        <div class="idea-meta">
+            <div class="category-badge">
+                <i class="fas fa-tag"></i>
+                {{ object.category.name }}
+            </div>
+            <div class="submission-info">
+                <div class="author-info">
+                    <div class="author-avatar">
+                        {{ object.submitted_by.username|first|upper }}
+                    </div>
+                    <div class="author-details">
+                        <div class="author-name">{{ object.submitted_by.username }}</div>
+                        <div class="submission-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            {{ object.submission_date|date:"F d, Y" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        {% if object.image %}
-            <img src="{{ object.image.url }}" class="img-fluid rounded mb-3" alt="{{ object.title }}">
-        {% endif %}
-        <h5 class="card-subtitle mb-2 text-muted"><strong>Category:</strong> {{ object.category.name }}</h5>
-        <p><strong>Submitted by:</strong> {{ object.submitted_by.username }} on {{ object.submission_date|date:"F d, Y" }}</p>
-        <hr>
-        <p>{{ object.description|linebreaks }}</p>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="idea-card">
+                <div class="idea-header">
+                    <h1 class="idea-title">{{ object.title }}</h1>
+                    <div class="idea-actions">
+                        {% if user == object.submitted_by or user.is_superuser %}
+                            <button type="button" class="btn-modern btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="fas fa-trash-alt"></i>
+                                Delete
+                            </button>
+                        {% endif %}
+                        <button type="button" class="btn-modern btn-share" onclick="shareIdea()">
+                            <i class="fas fa-share-alt"></i>
+                            Share
+                        </button>
+                    </div>
+                </div>
+
+                {% if object.image %}
+                <div class="idea-image-wrapper">
+                    <img src="{{ object.image.url }}" class="idea-image" alt="{{ object.title }}">
+                    <div class="image-overlay">
+                        <button class="image-expand" onclick="expandImage('{{ object.image.url }}')">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="idea-content">
+                    <div class="content-header">
+                        <h3><i class="fas fa-file-alt"></i> Description</h3>
+                    </div>
+                    <div class="description-text">
+                        {{ object.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sidebar-card">
+                <h4 class="sidebar-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Idea Stats
+                </h4>
+                <div class="stats-list">
+                    <div class="stat-item">
+                        <i class="fas fa-eye"></i>
+                        <span>Views: 127</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span>Likes: 34</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Comments: 8</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h4 class="sidebar-title">
+                    <i class="fas fa-tags"></i>
+                    Related Ideas
+                </h4>
+                <div class="related-ideas">
+                    <div class="related-item">
+                        <h5>Solar Panel Efficiency Booster</h5>
+                        <p>By TechInnovator</p>
+                    </div>
+                    <div class="related-item">
+                        <h5>Wind Energy Storage Solution</h5>
+                        <p>By EcoEngineer</p>
+                    </div>
+                    <div class="related-item">
+                        <h5>Smart Grid Integration</h5>
+                        <p>By GreenDev</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card action-card">
+                <h4 class="sidebar-title">
+                    <i class="fas fa-rocket"></i>
+                    Take Action
+                </h4>
+                <p>Inspired by this idea? Share your own green innovation!</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'submit_idea' %}" class="btn-modern btn-primary w-100">
+                        <i class="fas fa-plus-circle"></i>
+                        Submit Your Idea
+                    </a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="btn-modern btn-primary w-100">
+                        <i class="fas fa-user-plus"></i>
+                        Join Community
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
-
-
+<!-- Delete Confirmation Modal -->
 {% if user == object.submitted_by or user.is_superuser %}
-    <form method="post" action="{% url 'delete_idea' object.pk %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger mt-3">Delete This Idea</button>
-    </form>
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modern-modal">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                    Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<strong>{{ object.title }}</strong>"?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modern btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <form method="post" action="{% url 'delete_idea' object.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-modern btn-danger">
+                        <i class="fas fa-trash-alt"></i>
+                        Delete Idea
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endif %}
 
-<a href="{% url 'index' %}" class="btn btn-secondary mt-3">← Back to Home</a>
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body p-0">
+                <img id="modalImage" src="" class="w-100" alt="Expanded view">
+            </div>
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" style="background: rgba(0,0,0,0.5); border-radius: 50%; z-index: 1051;"></button>
+        </div>
+    </div>
+</div>
+
+<style>
+.detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.detail-header {
+    margin-bottom: 2rem;
+}
+
+.breadcrumb-nav {
+    background: #399944;
+    padding: 1rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+.breadcrumb-link, .breadcrumb-current, .breadcrumb-nav .fas.fa-chevron-right {
+    color: #fff !important;
+    font-weight: 600;
+}
+.breadcrumb-link:hover {
+    color: #b2f5ea !important;
+}
+
+.idea-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.category-badge {
+    background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.submission-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.author-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.2rem;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+.author-name {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 1rem;
+}
+
+.submission-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.idea-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(34, 197, 94, 0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.idea-header {
+    padding: 2rem;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.idea-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-green);
+    margin: 0;
+    flex: 1;
+    line-height: 1.3;
+}
+
+.idea-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.btn-share {
+    background: #f3f4f6;
+    color: var(--text-dark);
+}
+
+.btn-share:hover {
+    background: var(--light-green);
+    color: var(--primary-green);
+}
+
+.idea-image-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.idea-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.idea-image-wrapper:hover .image-overlay {
+    opacity: 1;
+}
+
+.idea-image-wrapper:hover .idea-image {
+    transform: scale(1.05);
+}
+
+.image-expand {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.image-expand:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+.idea-content {
+    padding: 2rem;
+}
+
+.content-header {
+    margin-bottom: 1.5rem;
+}
+
+.content-header h3 {
+    color: var(--dark-green);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.description-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--text-dark);
+}
+
+.description-text p {
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(34, 197, 94, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.sidebar-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.sidebar-title {
+    color: var(--dark-green);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    background: rgba(34, 197, 94, 0.05);
+}
+
+.stat-item i {
+    color: var(--primary-green);
+    width: 20px;
+}
+
+.related-ideas {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.related-item {
+    padding: 1rem;
+    border-radius: 8px;
+    background: rgba(34, 197, 94, 0.05);
+    border-left: 4px solid var(--primary-green);
+    transition: all 0.3s ease;
+}
+
+.related-item:hover {
+    background: rgba(34, 197, 94, 0.1);
+    transform: translateX(5px);
+}
+
+.related-item h5 {
+    margin: 0 0 0.25rem;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.related-item p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.action-card {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 185, 129, 0.03) 100%);
+    border-color: var(--primary-green);
+}
+
+.action-card p {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
+
+.modern-modal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modern-modal .modal-header {
+    border-bottom: 1px solid #f3f4f6;
+    padding: 1.5rem;
+}
+
+.modern-modal .modal-body {
+    padding: 1.5rem;
+}
+
+.modern-modal .modal-footer {
+    border-top: 1px solid #f3f4f6;
+    padding: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .idea-title {
+        font-size: 1.5rem;
+    }
+    
+    .idea-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .idea-actions {
+        justify-content: flex-end;
+    }
+    
+    .idea-meta {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+
+<script>
+function shareIdea() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ object.title }}',
+            text: 'Check out this green innovation idea on GreenTech Hub!',
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('Link copied to clipboard!');
+        });
+    }
+}
+
+function expandImage(src) {
+    document.getElementById('modalImage').src = src;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+</script>
 {% endblock %}
