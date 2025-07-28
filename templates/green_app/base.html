@@ -429,6 +429,167 @@
             border-left: 0.3em solid transparent;
             background: none !important;
         }
+
+        /* Dark Mode Styles */
+        body.dark {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e5e5e5;
+        }
+
+        body.dark .navbar {
+            background: rgba(45, 45, 45, 0.95);
+            border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        body.dark .nav-link {
+            color: #e5e5e5 !important;
+        }
+
+        body.dark .nav-link:hover {
+            color: var(--primary-green) !important;
+        }
+
+        body.dark .hero-section {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        body.dark .hero-title {
+            color: #ffffff;
+        }
+
+        body.dark .hero-subtitle {
+            color: #b0b0b0;
+        }
+
+        body.dark .section-title {
+            color: #ffffff;
+        }
+
+        body.dark .section-subtitle {
+            color: #b0b0b0;
+        }
+
+        body.dark .article-card {
+            background: #2d2d2d;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #e5e5e5;
+        }
+
+        body.dark .article-card:hover {
+            border-color: var(--primary-green);
+            background: #333333;
+        }
+
+        body.dark .article-title {
+            color: #ffffff;
+        }
+
+        body.dark .article-excerpt {
+            color: #b0b0b0;
+        }
+
+        body.dark .reports-section {
+            background: #2d2d2d;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        body.dark .report-item:hover {
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        body.dark .report-link {
+            color: #e5e5e5;
+        }
+
+        body.dark .report-link:hover {
+            color: var(--primary-green);
+        }
+
+        body.dark .footer {
+            background: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
+        }
+
+        body.dark .dropdown-menu {
+            background: #2d2d2d;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        body.dark .dropdown-item {
+            color: #e5e5e5;
+        }
+
+        body.dark .dropdown-item:hover {
+            background: rgba(34, 197, 94, 0.1);
+            color: #ffffff;
+        }
+
+        body.dark .dropdown-divider {
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+
+        body.dark .form-control {
+            background: #2d2d2d;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #e5e5e5;
+        }
+
+        body.dark .form-control:focus {
+            background: #333333;
+            border-color: var(--primary-green);
+            color: #ffffff;
+        }
+
+        body.dark .btn-outline-success {
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        body.dark .btn-outline-success:hover {
+            background: var(--primary-green);
+            color: #ffffff;
+        }
+
+        body.dark .alert {
+            background: #2d2d2d;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #e5e5e5;
+        }
+
+        /* Dark mode toggle button styles */
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-green);
+            background: #ffffff;
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark .dark-mode-toggle {
+            background: #2d2d2d;
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+
+        body.dark .dark-mode-toggle:hover {
+            background: #333333;
+        }
     </style>
 </head>
 <body id="body" class="">
@@ -444,15 +605,48 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i> About Us</a></li>
+                    
+                    <!-- Community Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="communityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-users"></i> Community
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="communityDropdown">
+                            <li><a class="dropdown-item" href="{% url 'project_list' %}"><i class="fas fa-project-diagram"></i> Projects</a></li>
+                            <li><a class="dropdown-item" href="{% url 'event_list' %}"><i class="fas fa-calendar-alt"></i> Events</a></li>
+                            <li><a class="dropdown-item" href="{% url 'resource_list' %}"><i class="fas fa-book"></i> Resources</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'newsletter_list' %}"><i class="fas fa-envelope"></i> Newsletters</a></li>
+                        </ul>
+                    </li>
+                    
                     {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'submit_idea' %}"><i class="fas fa-plus-circle"></i> Submit Idea</a></li>
+                        <!-- Create Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="createDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-plus"></i> Create
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="createDropdown">
+                                <li><a class="dropdown-item" href="{% url 'submit_idea' %}"><i class="fas fa-lightbulb"></i> Submit Idea</a></li>
+                                <li><a class="dropdown-item" href="{% url 'project_create' %}"><i class="fas fa-project-diagram"></i> Create Project</a></li>
+                                <li><a class="dropdown-item" href="{% url 'event_create' %}"><i class="fas fa-calendar-plus"></i> Create Event</a></li>
+                                <li><a class="dropdown-item" href="{% url 'resource_create' %}"><i class="fas fa-upload"></i> Upload Resource</a></li>
+                                {% if user.is_staff %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'newsletter_create' %}"><i class="fas fa-envelope"></i> Create Newsletter</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        
                         <!-- Account Dropdown -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user-circle"></i> Account
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                                <li><a class="dropdown-item" href="{% url 'user_profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
                                 <li><a class="dropdown-item" href="{% url 'user_history' %}"><i class="fas fa-history"></i> User History</a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                                 <li><a class="dropdown-item text-danger" href="{% url 'unregister' %}"><i class="fas fa-user-times"></i> Unregister</a></li>
                             </ul>
@@ -512,9 +706,9 @@
                     <h4>Quick Links</h4>
                     <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                         <a href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i> About Us</a>
-                        <a href="{% url 'submit_idea' %}"><i class="fas fa-plus-circle"></i> Submit Ideas</a>
-                        <a href="#"><i class="fas fa-newspaper"></i> Latest Articles</a>
-                        <a href="#"><i class="fas fa-users"></i> Community</a>
+                        <a href="{% url 'project_list' %}"><i class="fas fa-project-diagram"></i> Projects</a>
+                        <a href="{% url 'event_list' %}"><i class="fas fa-calendar-alt"></i> Events</a>
+                        <a href="{% url 'resource_list' %}"><i class="fas fa-book"></i> Resources</a>
                     </div>
                 </div>
 
@@ -557,21 +751,37 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Dark mode toggle -->
+    <button onclick="toggleDarkMode()" class="dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode">
+        <i class="fas fa-moon" id="darkModeIcon"></i>
+    </button>
+    
     <script>
         const toggleDarkMode = () => {
             const body = document.getElementById('body');
-            body.classList.toggle('dark');
-            localStorage.setItem('darkMode', body.classList.contains('dark'));
+            const icon = document.getElementById('darkModeIcon');
+            const isDark = body.classList.contains('dark');
+            
+            if (isDark) {
+                body.classList.remove('dark');
+                icon.className = 'fas fa-moon';
+                localStorage.setItem('darkMode', 'false');
+            } else {
+                body.classList.add('dark');
+                icon.className = 'fas fa-sun';
+                localStorage.setItem('darkMode', 'true');
+            }
         };
+        
         document.addEventListener('DOMContentLoaded', () => {
+            const body = document.getElementById('body');
+            const icon = document.getElementById('darkModeIcon');
+            
             if (localStorage.getItem('darkMode') === 'true') {
-                document.getElementById('body').classList.add('dark');
+                body.classList.add('dark');
+                icon.className = 'fas fa-sun';
             }
         });
     </script>
-    <button onclick="toggleDarkMode()" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;" class="btn btn-outline-dark rounded-circle shadow">
-        <i class="fas fa-moon"></i>
-    </button>
     <script>
         // Add smooth animations on scroll
         const observerOptions = {

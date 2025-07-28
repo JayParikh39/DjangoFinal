@@ -1,0 +1,199 @@
+{% extends 'green_app/base.html' %}
+
+{% block title %}Create Event{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">
+                        <i class="fas fa-calendar-alt"></i> Create New Event
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Event Title</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.title.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.description.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Provide a detailed description of your event, including agenda and what participants can expect.
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.category.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.date.id_for_label }}" class="form-label">Date & Time</label>
+                                    {{ form.date }}
+                                    {% if form.date.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.date.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                                    {{ form.location }}
+                                    {% if form.location.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.location.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Physical location or online platform details
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.max_participants.id_for_label }}" class="form-label">Max Participants</label>
+                                    {{ form.max_participants }}
+                                    {% if form.max_participants.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.max_participants.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Leave empty for unlimited participants
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.is_online }}
+                                        <label class="form-check-label" for="{{ form.is_online.id_for_label }}">
+                                            This is an online event
+                                        </label>
+                                    </div>
+                                    {% if form.is_online.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.is_online.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.registration_url.id_for_label }}" class="form-label">Registration URL</label>
+                                    {{ form.registration_url }}
+                                    {% if form.registration_url.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.registration_url.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Optional: Link to external registration page
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'event_list' %}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Create Event
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #{{ form.title.id_for_label }} {
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+    }
+    
+    #{{ form.description.id_for_label }} {
+        width: 100%;
+        min-height: 120px;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        resize: vertical;
+    }
+    
+    #{{ form.category.id_for_label }},
+    #{{ form.location.id_for_label }},
+    #{{ form.registration_url.id_for_label }} {
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+    }
+    
+    #{{ form.date.id_for_label }},
+    #{{ form.max_participants.id_for_label }} {
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+    }
+    
+    .form-check-input {
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %} 

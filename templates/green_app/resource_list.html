@@ -1,0 +1,155 @@
+{% extends 'green_app/base.html' %}
+
+{% block title %}Resources{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-book"></i> Resources</h1>
+                {% if user.is_authenticated %}
+                <a href="{% url 'resource_create' %}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Upload Resource
+                </a>
+                {% endif %}
+            </div>
+            
+            <!-- Filter Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="type" class="form-label">Filter by Type</label>
+                            <select name="type" id="type" class="form-select">
+                                <option value="">All Types</option>
+                                <option value="article" {% if request.GET.type == 'article' %}selected{% endif %}>Articles</option>
+                                <option value="video" {% if request.GET.type == 'video' %}selected{% endif %}>Videos</option>
+                                <option value="document" {% if request.GET.type == 'document' %}selected{% endif %}>Documents</option>
+                                <option value="tool" {% if request.GET.type == 'tool' %}selected{% endif %}>Tools</option>
+                                <option value="dataset" {% if request.GET.type == 'dataset' %}selected{% endif %}>Datasets</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <a href="{% url 'resource_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Clear
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Resources Grid -->
+            {% if resources %}
+                <div class="row">
+                    {% for resource in resources %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 resource-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title">{{ resource.title }}</h5>
+                                    <span class="badge bg-{% if resource.resource_type == 'article' %}primary{% elif resource.resource_type == 'video' %}danger{% elif resource.resource_type == 'document' %}success{% elif resource.resource_type == 'tool' %}warning{% else %}info{% endif %}">
+                                        <i class="fas fa-{% if resource.resource_type == 'article' %}file-alt{% elif resource.resource_type == 'video' %}video{% elif resource.resource_type == 'document' %}file-pdf{% elif resource.resource_type == 'tool' %}tools{% else %}database{% endif %}"></i>
+                                        {{ resource.get_resource_type_display }}
+                                    </span>
+                                </div>
+                                
+                                <p class="card-text text-muted">
+                                    <small>
+                                        <i class="fas fa-user"></i> {{ resource.uploaded_by.username }}<br>
+                                        <i class="fas fa-calendar"></i> {{ resource.created_at|date:"M d, Y" }}<br>
+                                        <i class="fas fa-download"></i> {{ resource.download_count }} downloads
+                                    </small>
+                                </p>
+                                
+                                <p class="card-text">
+                                    {{ resource.description|truncatewords:15 }}
+                                </p>
+                                
+                                {% if resource.category %}
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-tag"></i> {{ resource.category.name }}
+                                    </small>
+                                </p>
+                                {% endif %}
+                                
+                                <div class="mt-auto">
+                                    <a href="{% url 'resource_detail' resource.pk %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </a>
+                                    {% if resource.file %}
+                                    <a href="{{ resource.file.url }}" class="btn btn-outline-success btn-sm" download>
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                    {% elif resource.url %}
+                                    <a href="{{ resource.url }}" target="_blank" class="btn btn-outline-info btn-sm">
+                                        <i class="fas fa-external-link-alt"></i> Visit
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav aria-label="Resource pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                    <h3 class="text-muted">No Resources Found</h3>
+                    <p class="text-muted">No resources match your current filters.</p>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'resource_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Upload the First Resource
+                    </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.resource-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.resource-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+</style>
+{% endblock %} 

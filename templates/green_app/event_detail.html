@@ -1,0 +1,163 @@
+{% extends 'green_app/base.html' %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'event_list' %}">Events</a></li>
+            <li class="breadcrumb-item active">{{ event.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <!-- Event Information -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h3 mb-0">{{ event.title }}</h1>
+                        {% if event.is_online %}
+                            <span class="badge bg-info fs-6">
+                                <i class="fas fa-video"></i> Online Event
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="lead">{{ event.description }}</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user"></i> Organizer</h5>
+                            <p>{{ event.organizer.username }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-calendar"></i> Date & Time</h5>
+                            <p>
+                                {{ event.date|date:"F d, Y" }}<br>
+                                {{ event.date|date:"g:i A" }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-map-marker-alt"></i> Location</h5>
+                            {% if event.is_online %}
+                                <p>Online Event</p>
+                            {% else %}
+                                <p>{{ event.location }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-users"></i> Participants</h5>
+                            {% if event.max_participants %}
+                                <p>Maximum: {{ event.max_participants }} participants</p>
+                            {% else %}
+                                <p>No limit</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if event.category %}
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-tag"></i> Category</h5>
+                            <p>{{ event.category.name }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> Created on {{ event.created_at|date:"F d, Y" }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Event Actions -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Event Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if event.registration_url %}
+                            <a href="{{ event.registration_url }}" target="_blank" class="btn btn-success">
+                                <i class="fas fa-sign-in-alt"></i> Register for Event
+                            </a>
+                        {% endif %}
+                        
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fas fa-calendar-plus"></i> Add to Calendar
+                        </a>
+                        
+                        <a href="#" class="btn btn-outline-info">
+                            <i class="fas fa-share"></i> Share Event
+                        </a>
+                        
+                        {% if user == event.organizer %}
+                        <hr>
+                        <h6>Organizer Actions</h6>
+                        <a href="#" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-edit"></i> Edit Event
+                        </a>
+                        <a href="#" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-trash"></i> Delete Event
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Event Details -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Event Details</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-clock text-muted"></i>
+                            <strong>Duration:</strong> TBD
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-language text-muted"></i>
+                            <strong>Language:</strong> English
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-ticket-alt text-muted"></i>
+                            <strong>Cost:</strong> Free
+                        </li>
+                        {% if event.is_online %}
+                        <li class="mb-2">
+                            <i class="fas fa-video text-muted"></i>
+                            <strong>Platform:</strong> TBD
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.badge {
+    font-size: 0.875rem;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.list-unstyled li {
+    padding: 0.25rem 0;
+}
+</style>
+{% endblock %} 

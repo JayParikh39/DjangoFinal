@@ -1,0 +1,52 @@
+{% extends 'green_app/base.html' %}
+
+{% block title %}{{ newsletter.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'newsletter_list' %}">Newsletters</a></li>
+                    <li class="breadcrumb-item active">{{ newsletter.title }}</li>
+                </ol>
+            </nav>
+            
+            <article class="newsletter-content">
+                <header class="mb-4">
+                    <h1 class="display-4">{{ newsletter.title }}</h1>
+                    <div class="text-muted mb-3">
+                        <i class="fas fa-user"></i> By {{ newsletter.author.username }}<br>
+                        <i class="fas fa-calendar"></i> Published on {{ newsletter.created_at|date:"F d, Y" }}
+                        {% if newsletter.published_at %}
+                            <br><i class="fas fa-clock"></i> Published at {{ newsletter.published_at|date:"g:i A" }}
+                        {% endif %}
+                    </div>
+                </header>
+                
+                <div class="newsletter-body">
+                    {{ newsletter.content|linebreaks }}
+                </div>
+                
+                <footer class="mt-5 pt-3 border-top">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{% url 'newsletter_list' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left"></i> Back to Newsletters
+                            </a>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            {% if user.is_staff %}
+                            <a href="{% url 'newsletter_create' %}" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Create New Newsletter
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </footer>
+            </article>
+        </div>
+    </div>
+</div>
+{% endblock %} 

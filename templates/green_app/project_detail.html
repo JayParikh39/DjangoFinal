@@ -1,0 +1,153 @@
+{% extends 'green_app/base.html' %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'project_list' %}">Projects</a></li>
+            <li class="breadcrumb-item active">{{ project.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <!-- Project Information -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h3 mb-0">{{ project.title }}</h1>
+                        <span class="badge bg-{% if project.status == 'completed' %}success{% elif project.status == 'in_progress' %}warning{% elif project.status == 'planning' %}info{% else %}secondary{% endif %} fs-6">
+                            {{ project.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="lead">{{ project.description }}</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user"></i> Project Creator</h5>
+                            <p>{{ project.creator.username }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-lightbulb"></i> Based on Idea</h5>
+                            <p><a href="{% url 'idea_detail' project.idea.pk %}">{{ project.idea.title }}</a></p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-calendar"></i> Timeline</h5>
+                            <p>
+                                <strong>Start Date:</strong> {{ project.start_date|date:"M d, Y" }}<br>
+                                {% if project.end_date %}
+                                    <strong>End Date:</strong> {{ project.end_date|date:"M d, Y" }}
+                                {% else %}
+                                    <strong>End Date:</strong> <span class="text-muted">Not set</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-dollar-sign"></i> Budget</h5>
+                            {% if project.budget %}
+                                <p>${{ project.budget }}</p>
+                            {% else %}
+                                <p class="text-muted">Not specified</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> Created on {{ project.created_at|date:"F d, Y" }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Collaboration Section -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Collaborations</h5>
+                </div>
+                <div class="card-body">
+                    {% if collaborations %}
+                        {% for collaboration in collaborations %}
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                            <div>
+                                <strong>{{ collaboration.collaborator.username }}</strong><br>
+                                <small class="text-muted">{{ collaboration.role }}</small>
+                            </div>
+                            <span class="badge bg-{% if collaboration.status == 'accepted' %}success{% elif collaboration.status == 'pending' %}warning{% elif collaboration.status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                                {{ collaboration.get_status_display }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No collaborations yet.</p>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated and user != project.creator %}
+                    <hr>
+                    <h6>Request Collaboration</h6>
+                    <form method="post" action="{% url 'collaboration_request' project.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <input type="text" class="form-control" id="role" name="role" placeholder="e.g., Developer, Designer, Researcher" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" placeholder="Describe your interest in collaborating..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fas fa-handshake"></i> Request Collaboration
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Project Actions -->
+            {% if user == project.creator %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-cogs"></i> Project Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit"></i> Edit Project
+                        </a>
+                        <a href="#" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-tasks"></i> Manage Tasks
+                        </a>
+                        <a href="#" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-chart-line"></i> View Progress
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.badge {
+    font-size: 0.875rem;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.border {
+    border-color: #e9ecef !important;
+}
+</style>
+{% endblock %} 

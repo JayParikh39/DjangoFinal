@@ -1,0 +1,150 @@
+{% extends 'green_app/base.html' %}
+
+{% block title %}{{ resource.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'resource_list' %}">Resources</a></li>
+            <li class="breadcrumb-item active">{{ resource.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <!-- Resource Information -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h3 mb-0">{{ resource.title }}</h1>
+                        <span class="badge bg-{% if resource.resource_type == 'article' %}primary{% elif resource.resource_type == 'video' %}danger{% elif resource.resource_type == 'document' %}success{% elif resource.resource_type == 'tool' %}warning{% else %}info{% endif %} fs-6">
+                            <i class="fas fa-{% if resource.resource_type == 'article' %}file-alt{% elif resource.resource_type == 'video' %}video{% elif resource.resource_type == 'document' %}file-pdf{% elif resource.resource_type == 'tool' %}tools{% else %}database{% endif %}"></i>
+                            {{ resource.get_resource_type_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="lead">{{ resource.description }}</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user"></i> Uploaded By</h5>
+                            <p>{{ resource.uploaded_by.username }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-calendar"></i> Upload Date</h5>
+                            <p>{{ resource.created_at|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if resource.category %}
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-tag"></i> Category</h5>
+                            <p>{{ resource.category.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-download"></i> Downloads</h5>
+                            <p>{{ resource.download_count }} downloads</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> Last accessed: Just now
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resource Actions -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-download"></i> Download/Access</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if resource.file %}
+                            <a href="{{ resource.file.url }}" class="btn btn-success" download>
+                                <i class="fas fa-download"></i> Download File
+                            </a>
+                        {% endif %}
+                        
+                        {% if resource.url %}
+                            <a href="{{ resource.url }}" target="_blank" class="btn btn-info">
+                                <i class="fas fa-external-link-alt"></i> Visit Resource
+                            </a>
+                        {% endif %}
+                        
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fas fa-share"></i> Share Resource
+                        </a>
+                        
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="fas fa-bookmark"></i> Bookmark
+                        </a>
+                        
+                        {% if user == resource.uploaded_by %}
+                        <hr>
+                        <h6>Owner Actions</h6>
+                        <a href="#" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-edit"></i> Edit Resource
+                        </a>
+                        <a href="#" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-trash"></i> Delete Resource
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resource Details -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Resource Details</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-file text-muted"></i>
+                            <strong>Type:</strong> {{ resource.get_resource_type_display }}
+                        </li>
+                        {% if resource.file %}
+                        <li class="mb-2">
+                            <i class="fas fa-hdd text-muted"></i>
+                            <strong>File Size:</strong> {{ resource.file.size|filesizeformat }}
+                        </li>
+                        {% endif %}
+                        <li class="mb-2">
+                            <i class="fas fa-eye text-muted"></i>
+                            <strong>Views:</strong> {{ resource.download_count }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-plus text-muted"></i>
+                            <strong>Added:</strong> {{ resource.created_at|date:"M d, Y" }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.badge {
+    font-size: 0.875rem;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.list-unstyled li {
+    padding: 0.25rem 0;
+}
+</style>
+{% endblock %} 
