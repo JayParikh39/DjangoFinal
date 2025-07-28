@@ -73,6 +73,116 @@
                         {{ object.description|linebreaks }}
                     </div>
                 </div>
+
+                <!-- Rating Section -->
+                <div class="rating-section">
+                    <div class="content-header">
+                        <h3><i class="fas fa-star"></i> Rate this Idea</h3>
+                    </div>
+                    
+                    <div class="rating-stats">
+                        <div class="average-rating">
+                            <div class="rating-display">
+                                {% if average_rating %}
+                                    <span class="rating-number">{{ average_rating|floatformat:1 }}</span>
+                                    <div class="stars">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= average_rating %}
+                                                <i class="fas fa-star filled"></i>
+                                            {% elif forloop.counter <= average_rating|add:0.5 %}
+                                                <i class="fas fa-star-half-alt filled"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <span class="no-rating">No ratings yet</span>
+                                {% endif %}
+                            </div>
+                            <div class="rating-count">
+                                {% if total_ratings %}
+                                    <span>{{ total_ratings }} rating{{ total_ratings|pluralize }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if user.is_authenticated %}
+                        <div class="rating-form-container">
+                            <form method="post" action="{% url 'add_rating' object.id %}" class="rating-form">
+                                {% csrf_token %}
+                                <div class="rating-input">
+                                    <label for="{{ rating_form.rating.id_for_label }}">Your Rating:</label>
+                                    <div class="star-rating">
+                                        {% for i in "12345" %}
+                                            <input type="radio" name="{{ rating_form.rating.name }}" value="{{ forloop.counter }}" id="star{{ forloop.counter }}" class="star-input">
+                                            <label for="star{{ forloop.counter }}" class="star-label">
+                                                <i class="far fa-star"></i>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-modern btn-primary">
+                                    <i class="fas fa-star"></i>
+                                    Submit Rating
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="login-prompt">
+                            <p>Please <a href="{% url 'login' %}">login</a> to rate this idea.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Comments Section -->
+                <div class="comments-section">
+                    <div class="content-header">
+                        <h3><i class="fas fa-comments"></i> Comments ({{ comments.count }})</h3>
+                    </div>
+                    
+                    {% if user.is_authenticated %}
+                        <div class="comment-form-container">
+                            <form method="post" action="{% url 'add_comment' object.id %}" class="comment-form">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="{{ comment_form.content.id_for_label }}">Add a comment:</label>
+                                    {{ comment_form.content }}
+                                </div>
+                                <button type="submit" class="btn-modern btn-primary">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Post Comment
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+
+                    <div class="comments-list">
+                        {% for comment in comments %}
+                            <div class="comment-item">
+                                <div class="comment-header">
+                                    <div class="comment-author">
+                                        <div class="author-avatar small">
+                                            {{ comment.author.username|first|upper }}
+                                        </div>
+                                        <div class="author-info">
+                                            <div class="author-name">{{ comment.author.username }}</div>
+                                            <div class="comment-date">{{ comment.created_at|date:"F d, Y" }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="comment-content">
+                                    {{ comment.content|linebreaks }}
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="no-comments">
+                                <p>No comments yet. Be the first to share your thoughts!</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -391,6 +501,217 @@
     margin-bottom: 1.5rem;
 }
 
+/* Rating Section Styles */
+.rating-section {
+    padding: 2rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.rating-stats {
+    margin-bottom: 2rem;
+}
+
+.average-rating {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(34, 197, 94, 0.05);
+    border-radius: 12px;
+}
+
+.rating-display {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.rating-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-green);
+}
+
+.stars {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.stars i {
+    font-size: 1.2rem;
+    color: #ffd700;
+}
+
+.stars i.filled {
+    color: #ffd700;
+}
+
+.no-rating {
+    color: var(--text-light);
+    font-style: italic;
+}
+
+.rating-count {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.rating-form-container {
+    margin-bottom: 1rem;
+}
+
+.rating-form {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.rating-input {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.rating-input label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.star-rating {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.star-input {
+    display: none;
+}
+
+.star-label {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #ddd;
+    transition: color 0.2s ease;
+}
+
+.star-label:hover,
+.star-label:hover ~ .star-label,
+.star-input:checked ~ .star-label {
+    color: #ffd700;
+}
+
+.login-prompt {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(34, 197, 94, 0.05);
+    border-radius: 8px;
+}
+
+.login-prompt a {
+    color: var(--primary-green);
+    font-weight: 600;
+}
+
+/* Comments Section Styles */
+.comments-section {
+    padding: 2rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.comment-form-container {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(34, 197, 94, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(34, 197, 94, 0.1);
+}
+
+.comment-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.comment-form label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.comment-form textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.comment-item {
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #f3f4f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.comment-header {
+    margin-bottom: 1rem;
+}
+
+.comment-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.author-avatar.small {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+}
+
+.author-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.author-name {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.comment-content {
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.no-comments {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-light);
+    font-style: italic;
+}
+
 .sidebar-card {
     background: white;
     border-radius: 16px;
@@ -538,5 +859,65 @@ function expandImage(src) {
     document.getElementById('modalImage').src = src;
     new bootstrap.Modal(document.getElementById('imageModal')).show();
 }
+
+// Star rating functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const starInputs = document.querySelectorAll('.star-input');
+    const starLabels = document.querySelectorAll('.star-label');
+    
+    starLabels.forEach((label, index) => {
+        label.addEventListener('mouseenter', function() {
+            // Highlight stars up to current hover
+            starLabels.forEach((star, starIndex) => {
+                if (starIndex <= index) {
+                    star.querySelector('i').className = 'fas fa-star';
+                    star.style.color = '#ffd700';
+                } else {
+                    star.querySelector('i').className = 'far fa-star';
+                    star.style.color = '#ddd';
+                }
+            });
+        });
+        
+        label.addEventListener('mouseleave', function() {
+            // Reset to selected state
+            const checkedInput = document.querySelector('.star-input:checked');
+            if (checkedInput) {
+                const checkedIndex = Array.from(starInputs).indexOf(checkedInput);
+                starLabels.forEach((star, starIndex) => {
+                    if (starIndex <= checkedIndex) {
+                        star.querySelector('i').className = 'fas fa-star';
+                        star.style.color = '#ffd700';
+                    } else {
+                        star.querySelector('i').className = 'far fa-star';
+                        star.style.color = '#ddd';
+                    }
+                });
+            } else {
+                // Reset to default state
+                starLabels.forEach(star => {
+                    star.querySelector('i').className = 'far fa-star';
+                    star.style.color = '#ddd';
+                });
+            }
+        });
+        
+        label.addEventListener('click', function() {
+            // Update visual state when clicked
+            const input = document.getElementById('star' + (index + 1));
+            input.checked = true;
+            
+            starLabels.forEach((star, starIndex) => {
+                if (starIndex <= index) {
+                    star.querySelector('i').className = 'fas fa-star';
+                    star.style.color = '#ffd700';
+                } else {
+                    star.querySelector('i').className = 'far fa-star';
+                    star.style.color = '#ddd';
+                }
+            });
+        });
+    });
+});
 </script>
 {% endblock %}
