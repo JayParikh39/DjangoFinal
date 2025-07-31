@@ -23,18 +23,39 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">{{ newsletter.title }}</h5>
+                                {% if user.is_staff and not newsletter.is_published %}
+                                    <div class="alert alert-warning py-1 mb-2">
+                                        <small><i class="fas fa-clock"></i> Draft</small>
+                                    </div>
+                                {% endif %}
                                 <p class="card-text text-muted">
                                     <small>
                                         <i class="fas fa-user"></i> {{ newsletter.author.username }}<br>
                                         <i class="fas fa-calendar"></i> {{ newsletter.created_at|date:"M d, Y" }}
+                                        {% if newsletter.is_published and newsletter.published_at %}
+                                            <br><i class="fas fa-check-circle"></i> Published {{ newsletter.published_at|date:"M d, Y" }}
+                                        {% endif %}
                                     </small>
                                 </p>
                                 <p class="card-text">
                                     {{ newsletter.content|truncatewords:30 }}
                                 </p>
-                                <a href="{% url 'newsletter_detail' newsletter.pk %}" class="btn btn-primary btn-sm">
-                                    Read More
-                                </a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'newsletter_detail' newsletter.pk %}" class="btn btn-primary btn-sm">
+                                        Read More
+                                    </a>
+                                    {% if user.is_staff %}
+                                        <a href="{% url 'toggle_newsletter_publication' newsletter.pk %}" 
+                                           class="btn btn-sm {% if newsletter.is_published %}btn-warning{% else %}btn-success{% endif %}"
+                                           onclick="return confirm('Are you sure you want to {% if newsletter.is_published %}unpublish{% else %}publish{% endif %} this newsletter?')">
+                                            {% if newsletter.is_published %}
+                                                <i class="fas fa-eye-slash"></i> Unpublish
+                                            {% else %}
+                                                <i class="fas fa-eye"></i> Publish
+                                            {% endif %}
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -64,7 +85,13 @@
                 {% endif %}
             {% else %}
                 <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> No newsletters have been published yet.
+                    <i class="fas fa-info-circle"></i> 
+                    {% if user.is_staff %}
+                        No newsletters have been created yet. 
+                        <a href="{% url 'newsletter_create' %}" class="alert-link">Create the first newsletter</a>.
+                    {% else %}
+                        No newsletters have been published yet.
+                    {% endif %}
                 </div>
             {% endif %}
         </div>

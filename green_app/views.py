@@ -268,6 +268,9 @@ class NewsletterListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
+        # Staff users can see all newsletters, regular users only see published ones
+        if self.request.user.is_staff:
+            return super().get_queryset()
         return super().get_queryset().filter(is_published=True)
 
 class NewsletterDetailView(DetailView):
@@ -285,7 +288,10 @@ class NewsletterCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        messages.success(self.request, 'Newsletter created successfully!')
+        # Automatically publish newsletters created by staff
+        form.instance.is_published = True
+        form.instance.published_at = now()
+        messages.success(self.request, 'Newsletter created and published successfully!')
         return super().form_valid(form)
 
 # Existing views (keeping for compatibility)
@@ -390,3 +396,22 @@ def user_history_view(request):
         'last_visit': last_visit
     }
     return render(request, 'green_app/user_history.html', context)
+
+# Newsletter publication toggle for staff
+@login_required
+def toggle_newsletter_publication(request, newsletter_id):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("You don't have permission to perform this action.")
+    
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+    newsletter.is_published = not newsletter.is_published
+    
+    if newsletter.is_published:
+        newsletter.published_at = now()
+        messages.success(request, f'Newsletter "{newsletter.title}" has been published.')
+    else:
+        newsletter.published_at = None
+        messages.success(request, f'Newsletter "{newsletter.title}" has been unpublished.')
+    
+    newsletter.save()
+    return redirect('newsletter_list')

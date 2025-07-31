@@ -48,6 +48,7 @@ urlpatterns = [
     path('newsletters/', views.NewsletterListView.as_view(), name='newsletter_list'),
     path('newsletters/<int:pk>/', views.NewsletterDetailView.as_view(), name='newsletter_detail'),
     path('newsletters/create/', views.NewsletterCreateView.as_view(), name='newsletter_create'),
+    path('newsletters/<int:newsletter_id>/toggle/', views.toggle_newsletter_publication, name='toggle_newsletter_publication'),
     
     # Idea management
     path('idea/<int:pk>/delete/', views.delete_idea_view, name='delete_idea'),
